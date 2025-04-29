@@ -26,47 +26,52 @@ import {
   Textarea,
 } from "../shared/ui"
 import { PostItem } from "../entities/post/ui"
+import { Post } from "../entities/post/model"
+import { usePostFilterStore } from "../features/post-management/model/post-filter-store"
 
 const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
+  const {
+    searchQuery,
+    selectedTag,
+    sortBy,
+    sortOrder,
+    skip,
+    limit,
+    selectedPost,
+    showAddDialog,
+    showEditDialog,
+    showPostDetailDialog,
+    setSearchQuery,
+    setSelectedTag,
+    setSortBy,
+    setSortOrder,
+    setSkip,
+    setLimit,
+    setSelectedPost,
+    setShowAddDialog,
+    setShowEditDialog,
+    setShowPostDetailDialog,
+    updateURL,
+  } = usePostFilterStore()
+
   // 상태 관리
-  const [posts, setPosts] = useState([])
+  const [posts, setPosts] = useState<Post[]>([])
   const [total, setTotal] = useState(0)
-  const [skip, setSkip] = useState(parseInt(queryParams.get("skip") || "0"))
-  const [limit, setLimit] = useState(parseInt(queryParams.get("limit") || "10"))
-  const [searchQuery, setSearchQuery] = useState(queryParams.get("search") || "")
-  const [selectedPost, setSelectedPost] = useState(null)
-  const [sortBy, setSortBy] = useState(queryParams.get("sortBy") || "")
-  const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc")
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [showEditDialog, setShowEditDialog] = useState(false)
+
   const [newPost, setNewPost] = useState({ title: "", body: "", userId: 1 })
   const [loading, setLoading] = useState(false)
   const [tags, setTags] = useState([])
-  const [selectedTag, setSelectedTag] = useState(queryParams.get("tag") || "")
   const [comments, setComments] = useState({})
   const [selectedComment, setSelectedComment] = useState(null)
   const [newComment, setNewComment] = useState({ body: "", postId: null, userId: 1 })
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
-  const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
   const [showUserModal, setShowUserModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
-
-  // URL 업데이트 함수
-  const updateURL = () => {
-    const params = new URLSearchParams()
-    if (skip) params.set("skip", skip.toString())
-    if (limit) params.set("limit", limit.toString())
-    if (searchQuery) params.set("search", searchQuery)
-    if (sortBy) params.set("sortBy", sortBy)
-    if (sortOrder) params.set("sortOrder", sortOrder)
-    if (selectedTag) params.set("tag", selectedTag)
-    navigate(`?${params.toString()}`)
-  }
 
   // 게시물 가져오기
   const fetchPosts = () => {
@@ -357,18 +362,20 @@ const PostsManager = () => {
       </TableHeader>
       <TableBody>
         {posts.map((post) => (
-          <PostItem
-            post={post}
-            searchQuery={searchQuery}
-            selectedTag={selectedTag}
-            onSetSelectedTag={setSelectedTag}
-            onUpdateURL={updateURL}
-            onOpenUserModal={openUserModal}
-            onOpenPostDetail={openPostDetail}
-            onSetSelectedPost={openPostDetail}
-            onSetShowEditDialog={setShowEditDialog}
-            onDeletePost={deletePost}
-          />
+          <TableRow key={post.id}>
+            <PostItem
+              post={post}
+              searchQuery={searchQuery}
+              selectedTag={selectedTag}
+              onSetSelectedTag={setSelectedTag}
+              onUpdateURL={updateURL}
+              onOpenUserModal={openUserModal}
+              onOpenPostDetail={openPostDetail}
+              onSetSelectedPost={setSelectedPost}
+              onSetShowEditDialog={setShowEditDialog}
+              onDeletePost={deletePost}
+            />
+          </TableRow>
         ))}
       </TableBody>
     </Table>

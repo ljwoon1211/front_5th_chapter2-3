@@ -1,5 +1,5 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
-import { Button, TableCell, TableRow } from "../../../shared/ui"
+import { Button, TableCell } from "../../../shared/ui"
 import { Post } from "../model"
 
 interface PostItemProps {
@@ -43,7 +43,7 @@ export const PostItem = ({
   onDeletePost,
 }: PostItemProps) => {
   return (
-    <TableRow key={post.id}>
+    <>
       <TableCell>{post.id}</TableCell>
       <TableCell>
         <div className="space-y-1">
@@ -103,6 +103,6 @@ export const PostItem = ({
           </Button>
         </div>
       </TableCell>
-    </TableRow>
+    </>
   )
 }
