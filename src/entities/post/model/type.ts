@@ -1,7 +1,7 @@
 export interface Post {
   id: number,
   title: string,
-  author?: {
+  author: {
     id: number;
     username: string;
     image: string;

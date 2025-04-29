@@ -1,17 +1,11 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import { Button, TableCell } from "../../../shared/ui"
 import { Post } from "../model"
+import { usePostFilterStore } from "../../../features/post-management/model/post-filter-store"
+import { useUserModalStore } from "../../../features/user-management/model/user-modal-store"
 
 interface PostItemProps {
   post: Post
-  searchQuery?: string
-  selectedTag?: string
-  onSetSelectedTag: (tag: string) => void
-  onUpdateURL: () => void
-  onOpenUserModal: (author: string) => void
-  onOpenPostDetail: (post: Post) => void
-  onSetSelectedPost: (post: Post) => void
-  onSetShowEditDialog: (arg: boolean) => void
   onDeletePost: (postId: number) => void
 }
 
@@ -30,18 +24,12 @@ const highlightText = (text: string, highlight?: string) => {
   )
 }
 
-export const PostItem = ({
-  post,
-  searchQuery,
-  selectedTag,
-  onSetSelectedTag,
-  onUpdateURL,
-  onOpenUserModal,
-  onOpenPostDetail,
-  onSetSelectedPost,
-  onSetShowEditDialog,
-  onDeletePost,
-}: PostItemProps) => {
+export const PostItem = ({ post, onDeletePost }: PostItemProps) => {
+  const { searchQuery, selectedTag, setSelectedTag, updateURL, openPostDetail, setSelectedPost, setShowEditDialog } =
+    usePostFilterStore()
+
+  const { openUserModal } = useUserModalStore()
+
   return (
     <>
       <TableCell>{post.id}</TableCell>
@@ -59,8 +47,8 @@ export const PostItem = ({
                     : "text-blue-800 bg-blue-100 hover:bg-blue-200"
                 }`}
                 onClick={() => {
-                  onSetSelectedTag(tag)
-                  onUpdateURL()
+                  setSelectedTag(tag)
+                  updateURL()
                 }}
               >
                 {tag}
@@ -70,7 +58,7 @@ export const PostItem = ({
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onOpenUserModal(post.author)}>
+        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => openUserModal(post.author)}>
           <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
           <span>{post.author?.username}</span>
         </div>
@@ -85,15 +73,15 @@ export const PostItem = ({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => onOpenPostDetail(post)}>
+          <Button variant="ghost" size="sm" onClick={() => openPostDetail(post)}>
             <MessageSquare className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
-              onSetSelectedPost(post)
-              onSetShowEditDialog(true)
+              setSelectedPost(post)
+              setShowEditDialog(true)
             }}
           >
             <Edit2 className="w-4 h-4" />

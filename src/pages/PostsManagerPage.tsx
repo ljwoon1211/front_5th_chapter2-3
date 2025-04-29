@@ -28,11 +28,11 @@ import {
 import { PostItem } from "../entities/post/ui"
 import { Post } from "../entities/post/model"
 import { usePostFilterStore } from "../features/post-management/model/post-filter-store"
+import { useUserModalStore } from "../features/user-management/model/user-modal-store"
 
 const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
 
   const {
     searchQuery,
@@ -58,6 +58,8 @@ const PostsManager = () => {
     updateURL,
   } = usePostFilterStore()
 
+  const { selectedUser, showUserModal, setShowUserModal, openUserModal } = useUserModalStore()
+
   // 상태 관리
   const [posts, setPosts] = useState<Post[]>([])
   const [total, setTotal] = useState(0)
@@ -70,8 +72,6 @@ const PostsManager = () => {
   const [newComment, setNewComment] = useState({ body: "", postId: null, userId: 1 })
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
-  const [showUserModal, setShowUserModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
 
   // 게시물 가져오기
   const fetchPosts = () => {
@@ -298,18 +298,6 @@ const PostsManager = () => {
     setShowPostDetailDialog(true)
   }
 
-  // 사용자 모달 열기
-  const openUserModal = async (user) => {
-    try {
-      const response = await fetch(`/api/users/${user.id}`)
-      const userData = await response.json()
-      setSelectedUser(userData)
-      setShowUserModal(true)
-    } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error)
-    }
-  }
-
   useEffect(() => {
     fetchTags()
   }, [])
@@ -363,18 +351,7 @@ const PostsManager = () => {
       <TableBody>
         {posts.map((post) => (
           <TableRow key={post.id}>
-            <PostItem
-              post={post}
-              searchQuery={searchQuery}
-              selectedTag={selectedTag}
-              onSetSelectedTag={setSelectedTag}
-              onUpdateURL={updateURL}
-              onOpenUserModal={openUserModal}
-              onOpenPostDetail={openPostDetail}
-              onSetSelectedPost={setSelectedPost}
-              onSetShowEditDialog={setShowEditDialog}
-              onDeletePost={deletePost}
-            />
+            <PostItem post={post} onDeletePost={deletePost} />
           </TableRow>
         ))}
       </TableBody>
