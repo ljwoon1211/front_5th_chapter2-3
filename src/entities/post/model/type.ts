@@ -1,11 +1,10 @@
+import { User } from "../../user/model";
+
 export interface Post {
   id: number,
   title: string,
-  author: {
-    id: number;
-    username: string;
-    image: string;
-  },
+  userId: number,
+  author: User,
   tags?: string[];
   reactions?: {
     likes: number;

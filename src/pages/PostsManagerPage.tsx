@@ -29,6 +29,8 @@ import { PostItem } from "../entities/post/ui"
 import { Post } from "../entities/post/model"
 import { usePostFilterStore } from "../features/post-management/model/post-filter-store"
 import { useUserModalStore } from "../features/user-management/model/user-modal-store"
+import * as postApi from "../features/post-management/api"
+import PostList from "../features/post-management/ui/PostList"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -74,33 +76,17 @@ const PostsManager = () => {
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
 
   // 게시물 가져오기
-  const fetchPosts = () => {
+  const fetchPosts = async () => {
     setLoading(true)
-    let postsData
-    let usersData
-
-    fetch(`/api/posts?limit=${limit}&skip=${skip}`)
-      .then((response) => response.json())
-      .then((data) => {
-        postsData = data
-        return fetch("/api/users?limit=0&select=username,image")
-      })
-      .then((response) => response.json())
-      .then((users) => {
-        usersData = users.users
-        const postsWithUsers = postsData.posts.map((post) => ({
-          ...post,
-          author: usersData.find((user) => user.id === post.userId),
-        }))
-        setPosts(postsWithUsers)
-        setTotal(postsData.total)
-      })
-      .catch((error) => {
-        console.error("게시물 가져오기 오류:", error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    try {
+      const { posts, total } = await postApi.fetchPosts(limit, skip)
+      setPosts(posts)
+      setTotal(total)
+    } catch (error) {
+      console.error("게시물 가져오기 오류:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   // 태그 가져오기
@@ -336,28 +322,6 @@ const PostsManager = () => {
     )
   }
 
-  // 게시물 테이블 렌더링
-  const renderPostTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[50px]">ID</TableHead>
-          <TableHead>제목</TableHead>
-          <TableHead className="w-[150px]">작성자</TableHead>
-          <TableHead className="w-[150px]">반응</TableHead>
-          <TableHead className="w-[150px]">작업</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {posts.map((post) => (
-          <TableRow key={post.id}>
-            <PostItem post={post} onDeletePost={deletePost} />
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-
   // 댓글 렌더링
   const renderComments = (postId) => (
     <div className="mt-2">
@@ -476,7 +440,7 @@ const PostsManager = () => {
           </div>
 
           {/* 게시물 테이블 */}
-          {loading ? <div className="flex justify-center p-4">로딩 중...</div> : renderPostTable()}
+          <PostList posts={posts} loading={loading} onDeletePost={deletePost} />
 
           {/* 페이지네이션 */}
           <div className="flex justify-between items-center">
