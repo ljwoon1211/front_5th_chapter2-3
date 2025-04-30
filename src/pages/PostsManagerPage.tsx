@@ -25,12 +25,15 @@ import {
   TableRow,
   Textarea,
 } from "../shared/ui"
-import { PostItem } from "../entities/post/ui"
 import { Post } from "../entities/post/model"
 import { usePostFilterStore } from "../features/post-management/model/post-filter-store"
 import { useUserModalStore } from "../features/user-management/model/user-modal-store"
 import * as postApi from "../features/post-management/api"
-import PostList from "../features/post-management/ui/PostList"
+import { PostPagination } from "../features/post-management/ui/PostPagination"
+import { PostList } from "../widgets/post-list"
+import { PostAddDialog } from "../features/post-management/ui/PostAddDialog"
+import { usePostAddStore } from "../features/post-management/model/post-add-store"
+import { PostEditDialog } from "../features/post-management/ui/PostEditDialog"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -44,7 +47,6 @@ const PostsManager = () => {
     skip,
     limit,
     selectedPost,
-    showAddDialog,
     showEditDialog,
     showPostDetailDialog,
     setSearchQuery,
@@ -54,11 +56,12 @@ const PostsManager = () => {
     setSkip,
     setLimit,
     setSelectedPost,
-    setShowAddDialog,
     setShowEditDialog,
     setShowPostDetailDialog,
     updateURL,
   } = usePostFilterStore()
+
+  const { setShowAddDialog } = usePostAddStore()
 
   const { selectedUser, showUserModal, setShowUserModal, openUserModal } = useUserModalStore()
 
@@ -144,23 +147,6 @@ const PostsManager = () => {
       console.error("태그별 게시물 가져오기 오류:", error)
     }
     setLoading(false)
-  }
-
-  // 게시물 추가
-  const addPost = async () => {
-    try {
-      const response = await fetch("/api/posts/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPost),
-      })
-      const data = await response.json()
-      setPosts([data, ...posts])
-      setShowAddDialog(false)
-      setNewPost({ title: "", body: "", userId: 1 })
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
-    }
   }
 
   // 게시물 업데이트
@@ -438,89 +424,18 @@ const PostsManager = () => {
               </SelectContent>
             </Select>
           </div>
-
           {/* 게시물 테이블 */}
           <PostList posts={posts} loading={loading} onDeletePost={deletePost} />
-
           {/* 페이지네이션 */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span>표시</span>
-              <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>항목</span>
-            </div>
-            <div className="flex gap-2">
-              <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
-                이전
-              </Button>
-              <Button disabled={skip + limit >= total} onClick={() => setSkip(skip + limit)}>
-                다음
-              </Button>
-            </div>
-          </div>
+          <PostPagination total={total} skip={skip} limit={limit} onSkipChange={setSkip} onLimitChange={setLimit} />
         </div>
       </CardContent>
 
       {/* 게시물 추가 대화상자 */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 게시물 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={newPost.title}
-              onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-            />
-            <Textarea
-              rows={30}
-              placeholder="내용"
-              value={newPost.body}
-              onChange={(e) => setNewPost({ ...newPost, body: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="사용자 ID"
-              value={newPost.userId}
-              onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
-            />
-            <Button onClick={addPost}>게시물 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PostAddDialog posts={posts} onSetPosts={setPosts} />
 
       {/* 게시물 수정 대화상자 */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>게시물 수정</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={selectedPost?.title || ""}
-              onChange={(e) => setSelectedPost({ ...selectedPost, title: e.target.value })}
-            />
-            <Textarea
-              rows={15}
-              placeholder="내용"
-              value={selectedPost?.body || ""}
-              onChange={(e) => setSelectedPost({ ...selectedPost, body: e.target.value })}
-            />
-            <Button onClick={updatePost}>게시물 업데이트</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PostEditDialog posts={posts} onSetPosts={setPosts} />
 
       {/* 댓글 추가 대화상자 */}
       <Dialog open={showAddCommentDialog} onOpenChange={setShowAddCommentDialog}>

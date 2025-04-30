@@ -9,8 +9,6 @@ interface PostFilterState {
   skip: number;
   limit: number;
   selectedPost: Post | null;
-  showAddDialog: boolean;
-  showEditDialog: boolean;
   showPostDetailDialog: boolean;
 
   setSearchQuery: (query: string) => void;
@@ -20,8 +18,6 @@ interface PostFilterState {
   setSkip: (skip: number) => void;
   setLimit: (limit: number) => void;
   setSelectedPost: (post: Post | null) => void;
-  setShowAddDialog: (show: boolean) => void;
-  setShowEditDialog: (show: boolean) => void;
   setShowPostDetailDialog: (show: boolean) => void;
   openPostDetail: (post: Post) => void;
   updateURL: () => void;
@@ -35,8 +31,6 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
   skip: 0,
   limit: 10,
   selectedPost: null,
-  showAddDialog: false,
-  showEditDialog: false,
   showPostDetailDialog: false,
 
   setSearchQuery: (query) => set({ searchQuery: query }),
@@ -46,8 +40,6 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
   setSkip: (skip) => set({ skip }),
   setLimit: (limit) => set({ limit }),
   setSelectedPost: (post) => set({ selectedPost: post }),
-  setShowAddDialog: (show) => set({ showAddDialog: show }),
-  setShowEditDialog: (show) => set({ showEditDialog: show }),
   setShowPostDetailDialog: (show) => set({ showPostDetailDialog: show }),
 
   openPostDetail: (post) => {

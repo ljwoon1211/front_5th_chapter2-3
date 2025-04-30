@@ -1,5 +1,5 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -8,6 +8,7 @@ import PostsManager from "../src/pages/PostsManagerPage"
 import * as React from "react"
 import "@testing-library/jest-dom"
 import { TEST_POSTS, TEST_SEARCH_POST, TEST_USERS } from "./mockData"
+import { usePostAddStore } from "../src/features/post-management/model/post-add-store"
 
 // MSW 서버 설정
 const server = setupServer(
@@ -38,7 +39,12 @@ const server = setupServer(
     ])
   }),
 )
-
+beforeEach(() => {
+  // 스토어 초기화 또는 모킹
+  const { setShowAddDialog, resetNewPost, setNewPost } = usePostAddStore.getState()
+  resetNewPost()
+  setShowAddDialog(false)
+})
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -112,6 +118,10 @@ describe("PostsManager", () => {
 
     const addButton = screen.getByRole("button", { name: /게시물 추가/i })
     await user.click(addButton)
+
+    act(() => {
+      usePostAddStore.getState().setShowAddDialog(true)
+    })
 
     const titleInput = screen.getByPlaceholderText(/제목/i)
     const bodyInput = screen.getByPlaceholderText(/내용/i)

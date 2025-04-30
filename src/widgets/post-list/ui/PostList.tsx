@@ -34,5 +34,3 @@ export const PostList = ({ posts, loading, onDeletePost }: PostListProps) => {
     </Table>
   )
 }
-
-export default PostList
