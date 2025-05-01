@@ -1,40 +1,48 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import { Button, TableCell } from "../../../shared/ui"
 import { Post } from "../model/types"
-import { User } from "../../../entities/user/model"
-import { highlightText } from "../../../shared/lib/text"
+import { useDeletePostMutation } from "../../../features/post-management/api/post-mutations"
+import { useModalStore } from "../../../features/ui/model/model-store"
+import { usePostFilterUIStore } from "../../../features/post-filtering/model/post-filter-ui-store"
 
 interface PostItemProps {
   post: Post
   searchQuery?: string
-  selectedTag?: string
-  onTagSelect?: (tagName: string) => void
-  onPostDetail?: (post: Post) => void
-  onPostEdit?: (post: Post) => void
-  onPostDelete?: (id: number) => void
-  onUserDetail?: (user: User) => void
 }
 
-export const PostItem = ({
-  post,
-  searchQuery = "",
-  selectedTag = "",
-  onTagSelect,
-  onPostDetail,
-  onPostEdit,
-  onPostDelete,
-  onUserDetail,
-}: PostItemProps) => {
-  const handleDeletePost = () => {
-    if (onPostDelete) {
-      onPostDelete(post.id)
+export const PostItem = ({ post, searchQuery = "" }: PostItemProps) => {
+  const { openPostDetailDialog, openPostEditDialog, openUserDetailDialog } = useModalStore()
+
+  const { tag: selectedTag, setSelectedTag } = usePostFilterUIStore()
+  const { mutate: deletePost } = useDeletePostMutation()
+
+  const highlightText = (text: string, highlight?: string) => {
+    if (!text) return null
+    if (!highlight?.trim()) {
+      return <span>{text}</span>
     }
+    const regex = new RegExp(`(${highlight})`, "gi")
+    const parts = text.split(regex)
+    return (
+      <span>
+        {parts.map((part, i) =>
+          regex.test(part) ? (
+            <mark key={i} className="bg-yellow-200">
+              {part}
+            </mark>
+          ) : (
+            <span key={i}>{part}</span>
+          ),
+        )}
+      </span>
+    )
   }
 
+  const handleDeletePost = () => {
+    deletePost(post.id)
+  }
   const handleTagSelect = (tagName: string) => {
-    if (onTagSelect) {
-      onTagSelect(tagName)
-    }
+    setSelectedTag(tagName)
   }
 
   return (
@@ -68,7 +76,7 @@ export const PostItem = ({
         {post.author && (
           <div
             className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => onUserDetail && onUserDetail(post.author!)}
+            onClick={() => openUserDetailDialog(post.author!)}
           >
             <img src={post.author.image} alt={post.author.username} className="w-8 h-8 rounded-full" />
             <span>{post.author.username}</span>
@@ -87,10 +95,10 @@ export const PostItem = ({
 
       <TableCell>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => onPostDetail && onPostDetail(post)}>
+          <Button variant="ghost" size="sm" onClick={() => openPostDetailDialog(post)}>
             <MessageSquare className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onPostEdit && onPostEdit(post)}>
+          <Button variant="ghost" size="sm" onClick={() => openPostEditDialog(post)}>
             <Edit2 className="w-4 h-4" />
           </Button>
           <Button variant="ghost" size="sm" onClick={handleDeletePost}>
