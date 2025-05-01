@@ -35,11 +35,9 @@ export const CommentList = ({ comments, searchQuery = "", postId }: CommentListP
   }
 
   const handleLikeComment = (comment: Comment) => {
-    likeComment({
-      id: comment.id,
-      currentLikes: comment.likes || 0,
-      postId,
-    })
+    const currentLikes = comment.likes || 0
+    console.log(`좋아요 클릭: 댓글 ID ${comment.id}, 현재 좋아요 수: ${currentLikes}`)
+    likeComment({ id: comment.id, likes: currentLikes, postId: postId })
   }
 
   return (

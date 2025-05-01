@@ -49,7 +49,7 @@ export const useDeleteCommentMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, postId }: { id: number; postId: number }) => deleteComment(id),
+    mutationFn: ({ id }: { id: number; postId: number }) => deleteComment(id),
     onSuccess: (_, variables) => {
       const { id, postId } = variables;
 
@@ -75,19 +75,26 @@ export const useLikeCommentMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, currentLikes, postId }: { id: number; currentLikes: number; postId: number }) =>
-      likeComment(id, currentLikes),
+    mutationFn: ({ id, likes }: { id: number; likes: number; postId: number }) =>
+      likeComment(id, likes),
     onSuccess: (updatedComment, variables) => {
-      const { postId } = variables;
+      const postId = variables.postId;
+      const commentId = variables.id;
+      const currentLikes = variables.likes;
 
       queryClient.setQueryData(['comments', postId], (oldData: CommentsResponse) => {
-        if (!oldData) return oldData;
-
+        if (!oldData) return { comments: [updatedComment] };
         return {
           ...oldData,
-          comments: oldData.comments.map((comment: Comment) =>
-            comment.id === updatedComment.id ? { ...comment, likes: updatedComment.likes } : comment
-          ),
+          comments: oldData.comments.map((comment: Comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                likes: currentLikes + 1
+              };
+            }
+            return comment;
+          })
         };
       });
     },

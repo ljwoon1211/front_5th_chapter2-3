@@ -8,7 +8,6 @@ import { CommentList } from "../../comment-management/ui/CommentList"
 export const PostDetailDialog = () => {
   const { isPostDetailDialogOpen, closePostDetailDialog, selectedPost, openCommentAddDialog } = useModalStore()
   const { inputValue } = usePostFilterUIStore()
-  const { search: searchQuery } = usePostFilterUIStore()
 
   const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery(selectedPost?.id || 0)
 

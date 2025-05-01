@@ -36,5 +36,7 @@ export const likeComment = async (
   id: number,
   currentLikes: number
 ): Promise<Comment> => {
-  return api.patch<Comment>(`/comments/${id}`, { likes: currentLikes + 1 });
+  const response = await api.patch<Comment>(`/comments/${id}`, { likes: currentLikes + 1 });
+  console.log('API 실제 응답:', response); // 응답 확인
+  return response;
 };
