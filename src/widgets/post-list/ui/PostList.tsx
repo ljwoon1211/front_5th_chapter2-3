@@ -1,22 +1,23 @@
-import { useLocation, useNavigate } from "react-router-dom"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "../../../shared/ui"
+import { PostItem } from "../../../entities/post/ui/PostItem"
+import { Post } from "../../../entities/post/model"
+import { PostFilters } from "../../../features/post-filtering/ui/PostFilters"
+import { PostPagination } from "../../../features/post-management/ui/PostPagination"
 import { usePostFilterUIStore } from "../../../features/post-filtering/model/post-filter-ui-store"
 import {
-  usePostsByTagQuery,
   usePostsQuery,
   useSearchPostsQuery,
   useTagsQuery,
+  usePostsByTagQuery,
 } from "../../../features/post-management/api/post-queries"
 import { useEffect } from "react"
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "../../../shared/ui"
-import { PostPagination } from "../../../features/post-management/ui/PostPagination"
-import { Post } from "../../../entities/post/model"
-import { PostItem } from "../../../entities/post/ui/PostItem"
-import { PostFilters } from "../../../features/post-filtering/ui/PostFilters"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export const PostList = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // 필터 UI 상태 관리
   const {
     search,
     inputValue,
@@ -36,21 +37,20 @@ export const PostList = () => {
     getQueryParams,
   } = usePostFilterUIStore()
 
+  // 태그 목록 조회
   const { data: tagsData, isLoading: isTagsLoading } = useTagsQuery()
 
-  const searchQueryResult = useSearchPostsQuery(search || "", {
+  // 게시물 쿼리 - 조건에 따라 다른 쿼리 사용 (enabled 옵션으로 필요한 쿼리만 실행)
+  const searchQueryResult = useSearchPostsQuery(search, {
     enabled: !!search,
   })
 
-  const tagQueryResult = usePostsByTagQuery(
-    tag || "",
-    { skip, limit, sortBy, sortOrder },
-    { enabled: !!tag && !search },
-  )
+  const tagQueryResult = usePostsByTagQuery(tag, { skip, limit, sortBy, sortOrder }, { enabled: !!tag && !search })
 
   const postsQueryResult = usePostsQuery({ skip, limit, sortBy, sortOrder }, { enabled: !search && !tag })
 
-  const postsResult = searchQueryResult.data || tagQueryResult.data || postsQueryResult.data
+  // 게시물 데이터 및 로딩 상태
+  const postsData = searchQueryResult.data || tagQueryResult.data || postsQueryResult.data
   const isLoading =
     searchQueryResult.isLoading || tagQueryResult.isLoading || postsQueryResult.isLoading || isTagsLoading
 
@@ -102,7 +102,7 @@ export const PostList = () => {
       {/* 게시물 테이블 */}
       {isLoading ? (
         <div className="flex justify-center p-4">로딩 중...</div>
-      ) : postsResult?.posts && postsResult.posts.length > 0 ? (
+      ) : postsData?.posts && postsData.posts.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
@@ -114,7 +114,7 @@ export const PostList = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {postsResult.posts.map((post: Post) => (
+            {postsData.posts.map((post: Post) => (
               <TableRow key={post.id}>
                 <PostItem post={post} searchQuery={inputValue} />
               </TableRow>
@@ -127,11 +127,12 @@ export const PostList = () => {
         </div>
       )}
 
-      {postsResult && (
+      {/* 페이지네이션 컴포넌트 */}
+      {postsData && (
         <PostPagination
-          total={postsResult.total || 0}
-          skip={skip || 0}
-          limit={limit || 10}
+          total={postsData.total}
+          skip={skip}
+          limit={limit}
           onSkipChange={setSkip}
           onLimitChange={setLimit}
           isLoading={isLoading}
