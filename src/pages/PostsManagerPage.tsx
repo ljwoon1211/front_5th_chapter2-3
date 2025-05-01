@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Edit2, MessageSquare, Plus, Search, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
+import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
   Button,
@@ -11,30 +11,18 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   Textarea,
 } from "../shared/ui"
 import { Post } from "../entities/post/model"
-import { usePostFilterStore } from "../features/post-filtering/model/post-filter-store"
 import { useUserModalStore } from "../features/user-management/model/user-modal-store"
 import * as postApi from "../features/post-management/api"
-import { PostPagination } from "../features/post-management/ui/PostPagination"
-import { PostList } from "../widgets/post-list/ui/PostList2"
-import { PostAddDialog } from "../features/post-management/ui/PostAddDialog2"
-import { PostEditDialog } from "../features/post-management/ui/PostEditDialog2"
-import { usePostUIStore } from "../features/post-management/model/ui-store"
+import { PostList } from "../widgets/post-list/ui/PostList"
+
 import { useModalStore } from "../features/ui/model/model-store"
+import { PostAddDialog } from "../features/post-management/ui/PostAddDialog"
+import { PostEditDialog } from "../features/post-management/ui/PostEditDialog"
+import { usePostFilterUIStore } from "../features/post-filtering/model/post-filter-ui-store"
+import { PostDetailDialog } from "../features/post-management/ui/PostDetailDialog"
 // import { PostList } from "../widgets/post-list"
 // import { PostAddDialog } from "../features/post-management/ui/PostAddDialog"
 // import { usePostAddStore } from "../features/post-management/model/post-add-store"
@@ -45,32 +33,17 @@ const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const { sortBy, sortOrder, skip, limit, setSearchQuery, setSelectedTag, setSortBy, setSortOrder, setSkip, setLimit } =
+    usePostFilterUIStore()
+
   const {
-    searchQuery,
-    selectedTag,
-    sortBy,
-    sortOrder,
-    skip,
-    limit,
-    selectedPost,
-    showEditDialog,
+    selectedUser,
+    showUserModal,
+    setShowUserModal,
+    openUserModal,
     showPostDetailDialog,
-    setSearchQuery,
-    setSelectedTag,
-    setSortBy,
-    setSortOrder,
-    setSkip,
-    setLimit,
-    setSelectedPost,
-    setShowEditDialog,
     setShowPostDetailDialog,
-    updateURL,
-  } = usePostFilterStore()
-
-  // const { setShowAddDialog } = usePostAddStore()
-  const { setShowAddDialog } = usePostUIStore()
-
-  const { selectedUser, showUserModal, setShowUserModal, openUserModal } = useUserModalStore()
+  } = useUserModalStore()
   const { openPostAddDialog } = useModalStore()
   // 상태 관리
   const [posts, setPosts] = useState<Post[]>([])
@@ -265,14 +238,14 @@ const PostsManager = () => {
     fetchTags()
   }, [])
 
-  useEffect(() => {
-    if (selectedTag) {
-      fetchPostsByTag(selectedTag)
-    } else {
-      fetchPosts()
-    }
-    updateURL()
-  }, [skip, limit, sortBy, sortOrder, selectedTag])
+  // useEffect(() => {
+  //   if (selectedTag) {
+  //     fetchPostsByTag(selectedTag)
+  //   } else {
+  //     fetchPosts()
+  //   }
+  //   updateURL()
+  // }, [skip, limit, sortBy, sortOrder, selectedTag])
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -407,7 +380,8 @@ const PostsManager = () => {
       </Dialog>
 
       {/* 게시물 상세 보기 대화상자 */}
-      <Dialog open={showPostDetailDialog} onOpenChange={setShowPostDetailDialog}>
+      <PostDetailDialog />
+      {/* <Dialog open={showPostDetailDialog} onOpenChange={setShowPostDetailDialog}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{highlightText(selectedPost?.title, searchQuery)}</DialogTitle>
@@ -417,7 +391,7 @@ const PostsManager = () => {
             {renderComments(selectedPost?.id)}
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* 사용자 모달 */}
       <Dialog open={showUserModal} onOpenChange={setShowUserModal}>

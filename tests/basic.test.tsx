@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { http, HttpResponse } from "msw"
@@ -8,7 +8,6 @@ import PostsManager from "../src/pages/PostsManagerPage"
 import * as React from "react"
 import "@testing-library/jest-dom"
 import { TEST_POSTS, TEST_SEARCH_POST, TEST_USERS } from "./mockData"
-import { usePostAddStore } from "../src/features/post-management/model/post-add-store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 // MSW 서버 설정
@@ -51,12 +50,6 @@ const createTestQueryClient = () =>
     },
   })
 
-beforeEach(() => {
-  // 스토어 초기화 또는 모킹
-  const { setShowAddDialog, resetNewPost } = usePostAddStore.getState()
-  resetNewPost()
-  setShowAddDialog(false)
-})
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())

@@ -1,50 +1,64 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
-import { usePostAddStore } from "../model/post-add-store"
-import * as postApi from "../api"
-import { Post } from "../../../entities/post/model"
+import { usePostFormStore } from "../model/post-form-store"
+import { useAddPostMutation } from "../api/post-mutations"
+import { useModalStore } from "../../ui/model/model-store"
 
-interface PostAddDialogProps {
-  posts: Post[]
-  onSetPosts: (posts: Post[]) => void
-}
+export const PostAddDialog = () => {
+  const { isPostAddDialogOpen, closePostAddDialog } = useModalStore()
 
-export const PostAddDialog = ({ posts, onSetPosts }: PostAddDialogProps) => {
-  const { newPost, showAddDialog, setShowAddDialog, resetNewPost, handleInputChange } = usePostAddStore()
+  const { newPost, handleNewPostChange, resetNewPost } = usePostFormStore()
 
-  const handleSubmit = async () => {
+  const { mutate: addPost, isPending } = useAddPostMutation()
+
+  const handleSubmit = () => {
     if (!newPost.title || !newPost.body) return
 
-    try {
-      const data = await postApi.addPost(newPost)
-      onSetPosts([data, ...posts])
-      if (isSearchExecuted) {
-        // 검색 결과에 추가하는 함수 호출
-        usePostFilterStore.getState().setFilteredPosts([data, ...filteredPosts])
-      }
-      setShowAddDialog(false)
-      resetNewPost()
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
-    }
+    addPost(newPost, {
+      onSuccess: () => {
+        closePostAddDialog()
+        resetNewPost()
+      },
+    })
+  }
+
+  const handleClose = () => {
+    closePostAddDialog()
+    resetNewPost()
   }
 
   return (
-    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+    <Dialog open={isPostAddDialogOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 게시물 추가</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input name="title" placeholder="제목" value={newPost.title} onChange={handleInputChange} />
-          <Textarea name="body" rows={30} placeholder="내용" value={newPost.body} onChange={handleInputChange} />
+          <Input
+            name="title"
+            placeholder="제목"
+            value={newPost.title}
+            onChange={handleNewPostChange}
+            disabled={isPending}
+          />
+          <Textarea
+            name="body"
+            rows={15}
+            placeholder="내용"
+            value={newPost.body}
+            onChange={handleNewPostChange}
+            disabled={isPending}
+          />
           <Input
             name="userId"
             type="number"
             placeholder="사용자 ID"
             value={newPost.userId}
-            onChange={handleInputChange}
+            onChange={handleNewPostChange}
+            disabled={isPending}
           />
-          <Button onClick={handleSubmit}>게시물 추가</Button>
+          <Button onClick={handleSubmit} disabled={!newPost.title || !newPost.body || isPending}>
+            {isPending ? "추가 중..." : "게시물 추가"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

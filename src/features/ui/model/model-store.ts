@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Post } from '../../../entities/post/model';
 import { User } from '../../../entities/user/model';
+import { Comment } from '../../../entities/comment/model';
 
 
 

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { PostFilterParams } from '../../../entities/post/model';
 
 interface PostFilterUIState {
   skip: number;
@@ -8,9 +7,11 @@ interface PostFilterUIState {
   tag: string;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
+  inputValue: string;
 
   setSearchQuery: (query: string) => void;
   setSelectedTag: (tag: string) => void;
+  setInputValue: (value: string) => void;
   setSortBy: (sortBy: string) => void;
   setSortOrder: (sortOrder: 'asc' | 'desc') => void;
   setSkip: (skip: number) => void;
@@ -22,13 +23,14 @@ interface PostFilterUIState {
   resetFilters: () => void;
 }
 
-const initialState: PostFilterParams = {
+const initialState = {
   skip: 0,
   limit: 10,
   search: '',
   tag: '',
   sortBy: '',
-  sortOrder: 'asc',
+  sortOrder: 'asc' as 'asc' | 'desc',
+  inputValue: '',
 }
 
 export const usePostFilterUIStore = create<PostFilterUIState>((set, get) => ({
@@ -36,6 +38,7 @@ export const usePostFilterUIStore = create<PostFilterUIState>((set, get) => ({
 
   setSearchQuery: (search) => set({ search }),
   setSelectedTag: (tag) => set({ tag }),
+  setInputValue: (inputValue) => set({ inputValue }),
   setSortBy: (sortBy) => set({ sortBy }),
   setSortOrder: (sortOrder) => set({ sortOrder }),
   setSkip: (skip) => set({ skip }),
@@ -60,6 +63,7 @@ export const usePostFilterUIStore = create<PostFilterUIState>((set, get) => ({
       skip: parseInt(params.get('skip') || '0'),
       limit: parseInt(params.get('limit') || '10'),
       search: params.get('search') || '',
+      inputValue: params.get('search') || '',
       tag: params.get('tag') || '',
       sortBy: params.get('sortBy') || '',
       sortOrder: (params.get('sortOrder') as 'asc' | 'desc') || 'asc',

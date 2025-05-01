@@ -1,40 +1,80 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui"
-import * as postApi from "../api"
-import { Post } from "../../../entities/post/model"
-import { usePostEditStore } from "../model/post-edit-store"
+import { usePostFormStore } from "../model/post-form-store"
+import { useUpdatePostMutation } from "../api/post-mutations"
+import { useEffect } from "react"
+import { useModalStore } from "../../ui/model/model-store"
 
-interface PostEditDialogProps {
-  posts: Post[]
-  onSetPosts: (posts: Post[]) => void
-}
+/**
+ * 게시물 수정 대화상자 컴포넌트
+ */
+export const PostEditDialog = () => {
+  // 모달 상태 관리
+  const { isPostEditDialogOpen, closePostEditDialog, selectedPost } = useModalStore()
 
-export const PostEditDialog = ({ posts, onSetPosts }: PostEditDialogProps) => {
-  const { editingPost, showEditDialog, setShowEditDialog, handleInputChange } = usePostEditStore()
+  // 폼 상태 관리
+  const { editablePost, setEditablePost, handleEditablePostChange, resetEditablePost } = usePostFormStore()
 
-  const handleSubmit = async () => {
-    if (!editingPost || !editingPost.title || !editingPost.body) return
+  // 게시물 수정 뮤테이션
+  const { mutate: updatePost, isPending } = useUpdatePostMutation()
 
-    try {
-      const updatedPost = await postApi.updatePost({
-        ...editingPost,
+  // 선택된 게시물이 변경되면 편집 가능한 폼 상태 업데이트
+  useEffect(() => {
+    if (selectedPost && isPostEditDialogOpen) {
+      setEditablePost({
+        id: selectedPost.id,
+        title: selectedPost.title,
+        body: selectedPost.body,
+        userId: selectedPost.userId,
       })
-      onSetPosts(posts.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
-      setShowEditDialog(false)
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
     }
+  }, [selectedPost, isPostEditDialogOpen, setEditablePost])
+
+  // 제출 핸들러
+  const handleSubmit = () => {
+    if (!editablePost || !editablePost.title || !editablePost.body) return
+
+    updatePost(editablePost, {
+      onSuccess: () => {
+        closePostEditDialog()
+        resetEditablePost()
+      },
+    })
   }
 
+  // 대화상자 닫기 핸들러
+  const handleClose = () => {
+    closePostEditDialog()
+    resetEditablePost()
+  }
+
+  // 선택된 게시물이나 편집 가능한 데이터가 없으면 렌더링하지 않음
+  if (!selectedPost || !editablePost) return null
+
   return (
-    <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+    <Dialog open={isPostEditDialogOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>게시물 수정</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input placeholder="제목" value={editingPost?.title || ""} onChange={handleInputChange} />
-          <Textarea rows={15} placeholder="내용" value={editingPost?.body || ""} onChange={handleInputChange} />
-          <Button onClick={handleSubmit}>게시물 업데이트</Button>
+          <Input
+            name="title"
+            placeholder="제목"
+            value={editablePost.title || ""}
+            onChange={handleEditablePostChange}
+            disabled={isPending}
+          />
+          <Textarea
+            name="body"
+            rows={15}
+            placeholder="내용"
+            value={editablePost.body || ""}
+            onChange={handleEditablePostChange}
+            disabled={isPending}
+          />
+          <Button onClick={handleSubmit} disabled={!editablePost.title || !editablePost.body || isPending}>
+            {isPending ? "업데이트 중..." : "게시물 업데이트"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

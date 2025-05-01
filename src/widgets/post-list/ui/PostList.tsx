@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { PostFilters } from "../../../features/post-filtering/ui/PostFilters2"
 import { usePostFilterUIStore } from "../../../features/post-filtering/model/post-filter-ui-store"
 import {
   usePostsByTagQuery,
@@ -7,25 +6,27 @@ import {
   useSearchPostsQuery,
   useTagsQuery,
 } from "../../../features/post-management/api/post-queries"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "../../../shared/ui"
-import { PostPagination } from "../../../features/post-management/ui/PostPagination2"
+import { PostPagination } from "../../../features/post-management/ui/PostPagination"
 import { Post } from "../../../entities/post/model"
-import { PostItem } from "../../../entities/post/ui/PostItem2"
+import { PostItem } from "../../../entities/post/ui/PostItem"
+import { PostFilters } from "../../../features/post-filtering/ui/PostFilters"
 
 export const PostList = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // 필터 UI 상태 관리
   const {
     search,
+    inputValue,
     tag,
     sortBy,
     sortOrder,
     skip,
     limit,
     setSearchQuery,
+    setInputValue,
     setSelectedTag,
     setSortBy,
     setSortOrder,
@@ -34,8 +35,6 @@ export const PostList = () => {
     applyQueryParams,
     getQueryParams,
   } = usePostFilterUIStore()
-
-  const [inputValue, setInputValue] = useState(search)
 
   const { data: tagsData, isLoading: isTagsLoading } = useTagsQuery()
 

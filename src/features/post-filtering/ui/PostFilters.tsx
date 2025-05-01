@@ -1,23 +1,35 @@
 import { Search } from "lucide-react"
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../shared/ui"
-import { Tag } from "../../../entities/tag/model"
+import { SortOption } from "../../../entities/post/model/types"
+import { Tag } from "../../../entities/tag/model/types"
+
+const SORT_OPTIONS: SortOption[] = [
+  { value: "none", label: "없음" },
+  { value: "id", label: "ID" },
+  { value: "title", label: "제목" },
+  { value: "reactions", label: "반응" },
+]
+
+const SORT_ORDER_OPTIONS: SortOption[] = [
+  { value: "asc", label: "오름차순" },
+  { value: "desc", label: "내림차순" },
+]
 
 interface PostFiltersProps {
-  // 검색 관련 props
   searchQuery: string
   onSearchChange: (query: string) => void
   onSearch: () => void
 
-  // 태그 필터링 관련 props - 외부에서 주입받도록 변경
   tags: Tag[]
   selectedTag: string
   onTagChange: (tag: string) => void
 
-  // 정렬 관련 props
   sortBy: string
   onSortByChange: (value: string) => void
-  sortOrder: string
-  onSortOrderChange: (value: string) => void
+  sortOrder: "asc" | "desc"
+  onSortOrderChange: (value: "asc" | "desc") => void
+
+  isLoading?: boolean
 }
 
 export const PostFilters = ({
@@ -31,7 +43,9 @@ export const PostFilters = ({
   onSortByChange,
   sortOrder,
   onSortOrderChange,
+  isLoading = false,
 }: PostFiltersProps) => {
+  // 엔터 키 처리
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       onSearch()
@@ -39,8 +53,9 @@ export const PostFilters = ({
   }
 
   return (
-    <div className="flex gap-4">
-      <div className="flex-1">
+    <div className="flex flex-wrap gap-4 mb-4">
+      {/* 검색 입력 필드 */}
+      <div className="flex-1 min-w-[200px]">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -49,10 +64,12 @@ export const PostFilters = ({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             onKeyDown={handleKeyPress}
+            disabled={isLoading}
           />
         </div>
       </div>
-      <Select value={selectedTag} onValueChange={onTagChange}>
+
+      <Select value={selectedTag} onValueChange={onTagChange} disabled={isLoading}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="태그 선택" />
         </SelectTrigger>
@@ -65,24 +82,30 @@ export const PostFilters = ({
           ))}
         </SelectContent>
       </Select>
-      <Select value={sortBy} onValueChange={onSortByChange}>
+
+      <Select value={sortBy} onValueChange={onSortByChange} disabled={isLoading}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 기준" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="none">없음</SelectItem>
-          <SelectItem value="id">ID</SelectItem>
-          <SelectItem value="title">제목</SelectItem>
-          <SelectItem value="reactions">반응</SelectItem>
+          {SORT_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
-      <Select value={sortOrder} onValueChange={onSortOrderChange}>
+
+      <Select value={sortOrder} onValueChange={onSortOrderChange} disabled={isLoading || sortBy === "none"}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="asc">오름차순</SelectItem>
-          <SelectItem value="desc">내림차순</SelectItem>
+          {SORT_ORDER_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
