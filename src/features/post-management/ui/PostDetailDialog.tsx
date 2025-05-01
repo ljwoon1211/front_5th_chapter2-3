@@ -48,7 +48,7 @@ export const PostDetailDialog = () => {
           <div className="mt-2">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">댓글</h3>
-              <Button size="sm" onClick={() => openCommentAddDialog(selectedPost.id)}>
+              <Button size="sm" onClick={() => openCommentAddDialog(selectedPost)}>
                 <Plus className="w-3 h-3 mr-1" />
                 댓글 추가
               </Button>

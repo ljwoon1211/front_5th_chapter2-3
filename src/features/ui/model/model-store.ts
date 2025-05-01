@@ -38,7 +38,7 @@ interface ModalState {
   openPostDetailDialog: (post: Post) => void;
   closePostDetailDialog: () => void;
 
-  openCommentAddDialog: (postId: number) => void;
+  openCommentAddDialog: (post: Post) => void;
   closeCommentAddDialog: () => void;
 
   openCommentEditDialog: (comment: Comment) => void;
@@ -79,9 +79,9 @@ export const useModalStore = create<ModalState>((set) => ({
     isPostDetailDialogOpen: false
   }),
 
-  openCommentAddDialog: (postId) => set({
+  openCommentAddDialog: (post: Post) => set({
     isCommentAddDialogOpen: true,
-    selectedPost: { id: postId } as Post
+    selectedPost: post
   }),
   closeCommentAddDialog: () => set({
     isCommentAddDialogOpen: false
