@@ -66,7 +66,7 @@ export const PostList = () => {
 
   useEffect(() => {
     setInputValue(search)
-  }, [search])
+  }, [search, setInputValue])
 
   const handleSearch = () => {
     setSearchQuery(inputValue)

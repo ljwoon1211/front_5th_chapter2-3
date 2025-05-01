@@ -76,7 +76,14 @@ export const PostItem = ({ post, searchQuery = "" }: PostItemProps) => {
         {post.author && (
           <div
             className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => openUserDetailDialog(post.author!)}
+            onClick={() => {
+              console.log("Author data:", post.author) // 데이터 확인
+              if (post.author) {
+                openUserDetailDialog(post.author)
+              } else {
+                console.error("Author data is missing")
+              }
+            }}
           >
             <img src={post.author.image} alt={post.author.username} className="w-8 h-8 rounded-full" />
             <span>{post.author.username}</span>

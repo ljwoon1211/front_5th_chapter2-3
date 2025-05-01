@@ -1,2 +1,2 @@
-export { PostList } from './ui/PostList';
+export * from './ui/PostList';
 
