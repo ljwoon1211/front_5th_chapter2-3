@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { EditablePost, NewPost, Post, PostsResponse } from '../../../entities/post/model';
-// import { addPost, deletePost, updatePost } from '../../../shared/api/posts';
 import { addPost, deletePost, updatePost } from '../../../entities/post/api/posts';
 
 export const useAddPostMutation = () => {

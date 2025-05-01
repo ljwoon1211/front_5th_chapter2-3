@@ -1,5 +1,5 @@
-import { Comment } from "../../../entities/comment/model"
-import { CommentList } from "../../../entities/comment/ui/CommentList"
+import { Comment } from "../../../entities/comment/model/types"
+import { CommentListWidget } from "../../comment-list/ui/CommentListWidget"
 import { Button } from "../../../shared/ui"
 import { Plus } from "lucide-react"
 
@@ -9,6 +9,9 @@ interface CommentSectionWidgetProps {
   postId: number
   isLoading?: boolean
   onAddComment?: () => void
+  onEditComment?: (comment: Comment) => void
+  onDeleteComment?: (id: number, postId: number) => void
+  onLikeComment?: (comment: Comment, postId: number) => void
 }
 
 export const CommentSectionWidget = ({
@@ -17,6 +20,9 @@ export const CommentSectionWidget = ({
   postId,
   isLoading = false,
   onAddComment,
+  onEditComment,
+  onDeleteComment,
+  onLikeComment,
 }: CommentSectionWidgetProps) => {
   return (
     <div className="mt-2">
@@ -31,7 +37,14 @@ export const CommentSectionWidget = ({
       {isLoading ? (
         <div className="flex justify-center p-4">로딩 중...</div>
       ) : (
-        <CommentList comments={comments} searchQuery={searchQuery} postId={postId} />
+        <CommentListWidget
+          comments={comments}
+          searchQuery={searchQuery}
+          postId={postId}
+          onCommentEdit={onEditComment}
+          onCommentDelete={onDeleteComment}
+          onCommentLike={onLikeComment}
+        />
       )}
     </div>
   )

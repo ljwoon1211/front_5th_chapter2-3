@@ -21,13 +21,22 @@ export const CommentList = ({
   onCommentLike,
 }: CommentListProps) => {
   const handleDeleteComment = (id: number) => {
-    onCommentDelete && onCommentDelete(id, postId)
+    if (onCommentDelete) {
+      onCommentDelete(id, postId)
+    }
   }
 
   const handleLikeComment = (comment: Comment) => {
-    onCommentLike && onCommentLike(comment, postId)
+    if (onCommentLike) {
+      onCommentLike(comment, postId)
+    }
   }
 
+  const handleEditComment = (comment: Comment) => {
+    if (onCommentEdit) {
+      onCommentEdit(comment)
+    }
+  }
   return (
     <div className="space-y-1">
       {comments.map((comment) => (
@@ -46,7 +55,7 @@ export const CommentList = ({
               <ThumbsUp className="w-3 h-3" />
               <span className="ml-1 text-xs">{comment.likes || 0}</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => onCommentEdit && onCommentEdit(comment)}>
+            <Button variant="ghost" size="sm" onClick={() => handleEditComment(comment)}>
               <Edit2 className="w-3 h-3" />
             </Button>
             <Button variant="ghost" size="sm" onClick={() => handleDeleteComment(comment.id)}>

@@ -1,5 +1,6 @@
 import { EditablePost, NewPost, Post, PostFilterParams, PostsResponse } from "../model/types";
 import { api } from "../../../shared/api/base";
+import { Tag } from "../../tag/model";
 
 export const fetchPosts = async (
   params: Partial<PostFilterParams> = {}

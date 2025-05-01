@@ -12,11 +12,10 @@ export const highlightText = (text: string, highlight?: string) => {
       {parts.map((part, i) =>
         regex.test(part) ? (
           <mark key={i} className="bg-yellow-200">
-            {" "}
-            {part}{" "}
+            {part}
           </mark>
         ) : (
-          <span key={i}> {part} </span>
+          <span key={i}>{part}</span>
         ),
       )}
     </span>
