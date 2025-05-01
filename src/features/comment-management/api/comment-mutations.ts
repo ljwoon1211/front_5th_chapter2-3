@@ -16,10 +16,6 @@ export const useAddCommentMutation = () => {
           comments: [...oldData.comments, comment],
         };
       });
-
-      // queryClient.invalidateQueries({
-      //   queryKey: ['post', comment.postId],
-      // });
     },
   });
 };
@@ -53,7 +49,6 @@ export const useDeleteCommentMutation = () => {
     onSuccess: (_, variables) => {
       const { id, postId } = variables;
 
-      // 댓글 목록 쿼리 캐시 업데이트
       queryClient.setQueryData(['comments', postId], (oldData: CommentsResponse) => {
         if (!oldData) return oldData;
 
@@ -63,9 +58,6 @@ export const useDeleteCommentMutation = () => {
         };
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ['post', postId],
-      });
     },
   });
 };

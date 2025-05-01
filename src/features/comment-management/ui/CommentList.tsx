@@ -36,24 +36,23 @@ export const CommentList = ({ comments, searchQuery = "", postId }: CommentListP
 
   const handleLikeComment = (comment: Comment) => {
     const currentLikes = comment.likes || 0
-    console.log(`좋아요 클릭: 댓글 ID ${comment.id}, 현재 좋아요 수: ${currentLikes}`)
     likeComment({ id: comment.id, likes: currentLikes, postId: postId })
   }
 
   return (
     <div className="space-y-1">
       {comments.map((comment) => (
-        <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
-          <div className="flex items-center space-x-2 overflow-hidden">
+        <div key={comment.id} className="flex flex-wrap items-start justify-between text-sm border-b pb-1">
+          <div className="flex-1 min-w-0 mr-2">
             {comment.user && (
               <>
-                <span className="font-medium truncate">{comment.user.username}:</span>
-                <span className="truncate">{highlightText(comment.body, searchQuery)}</span>
+                <span className="font-medium">{comment.user.username}:</span>
+                <span className="break-words">{highlightText(comment.body, searchQuery)}</span>
               </>
             )}
           </div>
 
-          <div className="flex items-center space-x-1">
+          <div className="flex flex-shrink-0 items-center space-x-1">
             <Button variant="ghost" size="sm" onClick={() => handleLikeComment(comment)}>
               <ThumbsUp className="w-3 h-3" />
               <span className="ml-1 text-xs">{comment.likes || 0}</span>

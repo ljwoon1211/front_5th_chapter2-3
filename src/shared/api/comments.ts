@@ -31,12 +31,9 @@ export const deleteComment = async (
   return api.delete<void>(`/comments/${id}`);
 };
 
-// 댓글 좋아요
 export const likeComment = async (
   id: number,
   currentLikes: number
 ): Promise<Comment> => {
-  const response = await api.patch<Comment>(`/comments/${id}`, { likes: currentLikes + 1 });
-  console.log('API 실제 응답:', response); // 응답 확인
-  return response;
+  return api.patch<Comment>(`/comments/${id}`, { likes: currentLikes + 1 });
 };

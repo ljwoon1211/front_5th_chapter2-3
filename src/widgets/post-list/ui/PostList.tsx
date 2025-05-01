@@ -37,10 +37,8 @@ export const PostList = () => {
     getQueryParams,
   } = usePostFilterUIStore()
 
-  // 태그 목록 조회
   const { data: tagsData, isLoading: isTagsLoading } = useTagsQuery()
 
-  // 게시물 쿼리 - 조건에 따라 다른 쿼리 사용 (enabled 옵션으로 필요한 쿼리만 실행)
   const searchQueryResult = useSearchPostsQuery(search, {
     enabled: !!search,
   })
@@ -49,7 +47,6 @@ export const PostList = () => {
 
   const postsQueryResult = usePostsQuery({ skip, limit, sortBy, sortOrder }, { enabled: !search && !tag })
 
-  // 게시물 데이터 및 로딩 상태
   const postsData = searchQueryResult.data || tagQueryResult.data || postsQueryResult.data
   const isLoading =
     searchQueryResult.isLoading || tagQueryResult.isLoading || postsQueryResult.isLoading || isTagsLoading
