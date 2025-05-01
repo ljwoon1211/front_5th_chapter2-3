@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Post } from '../../../entities/post/model/type';
+import { Post } from '../../../entities/post/model/types';
 
 interface PostFilterState {
   searchQuery: string;

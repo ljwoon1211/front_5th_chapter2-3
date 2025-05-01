@@ -9,6 +9,7 @@ import * as React from "react"
 import "@testing-library/jest-dom"
 import { TEST_POSTS, TEST_SEARCH_POST, TEST_USERS } from "./mockData"
 import { usePostAddStore } from "../src/features/post-management/model/post-add-store"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 // MSW 서버 설정
 const server = setupServer(
@@ -39,6 +40,17 @@ const server = setupServer(
     ])
   }),
 )
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false, // 테스트 시 리트라이 비활성화
+        gcTime: Infinity, // 테스트 간 캐시 유지 (필요에 따라 조정)
+      },
+    },
+  })
+
 beforeEach(() => {
   // 스토어 초기화 또는 모킹
   const { setShowAddDialog, resetNewPost } = usePostAddStore.getState()
@@ -51,10 +63,14 @@ afterAll(() => server.close())
 
 // 테스트에 공통으로 사용될 render 함수
 const renderPostsManager = () => {
+  const queryClient = createTestQueryClient() // 각 렌더링마다 새 클라이언트 생성 (격리성 보장)
+
   return render(
-    <MemoryRouter>
-      <PostsManager />
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <PostsManager />
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 

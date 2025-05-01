@@ -1,1 +1,1 @@
-export type { Tag } from "./type.ts"
+export * from './types';

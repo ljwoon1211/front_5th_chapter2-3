@@ -4,7 +4,7 @@ export interface Post {
   id: number,
   title: string,
   userId: number,
-  author: User,
+  author?: User,
   tags?: string[];
   reactions?: {
     likes: number;
@@ -12,6 +12,13 @@ export interface Post {
     total: number;
   },
   body: string,
+}
+
+export interface PostsResponse {
+  posts: Post[];
+  total: number;
+  skip: number;
+  limit: number;
 }
 
 export interface NewPost {
@@ -28,12 +35,12 @@ export interface EditablePost {
 }
 
 export interface PostFilterParams {
-  skip?: number;
-  limit?: number;
-  search?: string;
-  tag?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  skip: number;
+  limit: number;
+  search: string;
+  tag: string;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 export type SortOption = {

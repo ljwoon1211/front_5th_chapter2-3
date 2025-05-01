@@ -1,1 +1,1 @@
-export type { User } from "./type.ts"
+export * from './types';
