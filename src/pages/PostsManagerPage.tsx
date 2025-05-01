@@ -26,14 +26,15 @@ import {
   Textarea,
 } from "../shared/ui"
 import { Post } from "../entities/post/model"
-import { usePostFilterStore } from "../features/post-management/model/post-filter-store"
+import { usePostFilterStore } from "../features/post-filtering/model/post-filter-store"
 import { useUserModalStore } from "../features/user-management/model/user-modal-store"
 import * as postApi from "../features/post-management/api"
 import { PostPagination } from "../features/post-management/ui/PostPagination"
-import { PostList } from "../widgets/post-list"
+// import { PostList } from "../widgets/post-list"
 import { PostAddDialog } from "../features/post-management/ui/PostAddDialog"
 import { usePostAddStore } from "../features/post-management/model/post-add-store"
 import { PostEditDialog } from "../features/post-management/ui/PostEditDialog"
+import { PostList } from "../features/post-management/ui/PostList"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -147,22 +148,6 @@ const PostsManager = () => {
       console.error("태그별 게시물 가져오기 오류:", error)
     }
     setLoading(false)
-  }
-
-  // 게시물 업데이트
-  const updatePost = async () => {
-    try {
-      const response = await fetch(`/api/posts/${selectedPost.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectedPost),
-      })
-      const data = await response.json()
-      setPosts(posts.map((post) => (post.id === data.id ? data : post)))
-      setShowEditDialog(false)
-    } catch (error) {
-      console.error("게시물 업데이트 오류:", error)
-    }
   }
 
   // 게시물 삭제
@@ -370,7 +355,8 @@ const PostsManager = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
-          <div className="flex gap-4">
+          <PostList tags={tags} posts={posts} onDeletePost={deletePost} />
+          {/* <div className="flex gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -424,8 +410,7 @@ const PostsManager = () => {
               </SelectContent>
             </Select>
           </div>
-          {/* 게시물 테이블 */}
-          <PostList posts={posts} loading={loading} onDeletePost={deletePost} />
+          <PostList posts={posts} loading={loading} onDeletePost={deletePost} /> */}
           {/* 페이지네이션 */}
           <PostPagination total={total} skip={skip} limit={limit} onSkipChange={setSkip} onLimitChange={setLimit} />
         </div>

@@ -54,7 +54,7 @@ export const searchPosts = async (searchQuery: string) => {
 }
 
 // 태그별 게시물 가져오기
-export const fetchPostsByTag = async (tag: string, limit: number, skip: number) => {
+export const fetchPostsByTag = async (tag: string, limit: number = 100, skip: number = 0) => {
   if (!tag || tag === "all") {
     return fetchPosts(limit, skip)
   }

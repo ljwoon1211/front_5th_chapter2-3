@@ -1,9 +1,6 @@
 import { create } from "zustand";
-interface NewPost {
-  title: string;
-  body: string;
-  userId: number;
-}
+import { NewPost } from "../../../entities/post/model";
+
 
 interface PostAddState {
   showAddDialog: boolean;

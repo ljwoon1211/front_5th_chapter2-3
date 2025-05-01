@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
-import { act, render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
@@ -41,7 +41,7 @@ const server = setupServer(
 )
 beforeEach(() => {
   // 스토어 초기화 또는 모킹
-  const { setShowAddDialog, resetNewPost, setNewPost } = usePostAddStore.getState()
+  const { setShowAddDialog, resetNewPost } = usePostAddStore.getState()
   resetNewPost()
   setShowAddDialog(false)
 })
@@ -61,6 +61,7 @@ const renderPostsManager = () => {
 describe("PostsManager", () => {
   it("게시물을 렌더링하고 검색을 허용합니다", async () => {
     const user = userEvent.setup()
+
     renderPostsManager()
 
     // 로딩 상태 확인 (선택적)
@@ -86,6 +87,7 @@ describe("PostsManager", () => {
 
   it("새 게시물 추가를 허용합니다", async () => {
     const user = userEvent.setup()
+
     const NEW_POST = {
       id: TEST_POSTS.posts.length + 1,
       title: "New Post",
@@ -118,10 +120,6 @@ describe("PostsManager", () => {
 
     const addButton = screen.getByRole("button", { name: /게시물 추가/i })
     await user.click(addButton)
-
-    act(() => {
-      usePostAddStore.getState().setShowAddDialog(true)
-    })
 
     const titleInput = screen.getByPlaceholderText(/제목/i)
     const bodyInput = screen.getByPlaceholderText(/내용/i)

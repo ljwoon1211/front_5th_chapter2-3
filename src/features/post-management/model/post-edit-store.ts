@@ -1,12 +1,7 @@
 import { create } from "zustand";
-import { Post } from "../../../entities/post/model";
+import { EditablePost } from "../../../entities/post/model";
 
-interface EditablePost {
-  id: number;
-  title: string;
-  body: string;
-  userId: number;
-}
+
 
 interface PostEditState {
   showEditDialog: boolean;
@@ -14,8 +9,8 @@ interface PostEditState {
 
   // 액션
   setShowEditDialog: (show: boolean) => void;
-  setEditingPost: (post: Post | null) => void;
-  updateEditingPost: (postData: Partial<EditablePost>) => void;
+  setEditingPost: (post: EditablePost) => void;
+  updateEditingPost: (postData: EditablePost) => void;
 
   // 유틸리티 메소드
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;

@@ -1,8 +1,9 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import { Button, TableCell } from "../../../shared/ui"
 import { Post } from "../model"
-import { usePostFilterStore } from "../../../features/post-management/model/post-filter-store"
+import { usePostFilterStore } from "../../../features/post-filtering/model/post-filter-store"
 import { useUserModalStore } from "../../../features/user-management/model/user-modal-store"
+import { usePostEditStore } from "../../../features/post-management/model/post-edit-store"
 
 interface PostItemProps {
   post: Post
@@ -25,8 +26,8 @@ const highlightText = (text: string, highlight?: string) => {
 }
 
 export const PostItem = ({ post, onDeletePost }: PostItemProps) => {
-  const { searchQuery, selectedTag, setSelectedTag, updateURL, openPostDetail, setSelectedPost, setShowEditDialog } =
-    usePostFilterStore()
+  const { searchQuery, selectedTag, setSelectedTag, updateURL, openPostDetail } = usePostFilterStore()
+  const { setEditingPost, setShowEditDialog } = usePostEditStore()
 
   const { openUserModal } = useUserModalStore()
 
@@ -80,7 +81,7 @@ export const PostItem = ({ post, onDeletePost }: PostItemProps) => {
             variant="ghost"
             size="sm"
             onClick={() => {
-              setSelectedPost(post)
+              setEditingPost(post)
               setShowEditDialog(true)
             }}
           >
