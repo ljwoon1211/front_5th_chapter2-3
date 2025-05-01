@@ -26,3 +26,17 @@ export interface EditablePost {
   body?: string;
   userId: number;
 }
+
+export interface PostFilterParams {
+  skip?: number;
+  limit?: number;
+  search?: string;
+  tag?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export type SortOption = {
+  value: string;
+  label: string;
+}

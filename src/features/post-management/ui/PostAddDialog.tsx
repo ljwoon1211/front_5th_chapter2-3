@@ -17,6 +17,10 @@ export const PostAddDialog = ({ posts, onSetPosts }: PostAddDialogProps) => {
     try {
       const data = await postApi.addPost(newPost)
       onSetPosts([data, ...posts])
+      if (isSearchExecuted) {
+        // 검색 결과에 추가하는 함수 호출
+        usePostFilterStore.getState().setFilteredPosts([data, ...filteredPosts])
+      }
       setShowAddDialog(false)
       resetNewPost()
     } catch (error) {

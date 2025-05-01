@@ -1,7 +1,7 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import { Button, TableCell } from "../../../shared/ui"
 import { Post } from "../model"
-import { usePostFilterStore } from "../../../features/post-filtering/model/post-filter-store"
+import { usePostFilterStore } from "../../../features/post-filtering/model/post-filter-store2"
 import { useUserModalStore } from "../../../features/user-management/model/user-modal-store"
 import { usePostEditStore } from "../../../features/post-management/model/post-edit-store"
 
@@ -16,8 +16,11 @@ const highlightText = (text: string, highlight?: string) => {
   if (!highlight?.trim()) {
     return <span>{text}</span>
   }
+
+  // 하이라이트 로직
   const regex = new RegExp(`(${highlight})`, "gi")
   const parts = text.split(regex)
+
   return (
     <span>
       {parts.map((part, i) => (regex.test(part) ? <mark key={i}>{part}</mark> : <span key={i}>{part}</span>))}

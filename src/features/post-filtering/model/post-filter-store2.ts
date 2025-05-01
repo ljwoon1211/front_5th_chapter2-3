@@ -1,3 +1,4 @@
+// src/features/post-filtering/model/post-filter-store2.ts 수정
 import { create } from "zustand"
 import { Post } from "../../../entities/post/model"
 import * as postApi from "../api"
@@ -11,6 +12,7 @@ interface PostFilterState {
   isLoading: boolean
   selectedPost: Post | null
   isDetailModalOpen: boolean
+  isSearchExecuted: boolean // 검색 실행 여부 추가
 
   setSearchQuery: (query: string) => void
   setSelectedTag: (tag: string) => void
@@ -22,18 +24,25 @@ interface PostFilterState {
   openPostDetail: (post: Post) => void
   closePostDetail: () => void
   updateURL: () => void
+  resetStore: () => void // 스토어 초기화 함수 추가
 }
 
-export const usePostFilterStore = create<PostFilterState>((set, get) => ({
-  // 초기 상태
+// 초기 상태를 상수로 정의
+const initialState = {
   searchQuery: "",
   selectedTag: "all",
   sortBy: "none",
   sortOrder: "asc",
-  filteredPosts: [], // 명시적으로 빈 배열로 초기화
+  filteredPosts: [],
   isLoading: false,
   selectedPost: null,
   isDetailModalOpen: false,
+  isSearchExecuted: false,
+};
+
+export const usePostFilterStore = create<PostFilterState>((set, get) => ({
+  // 초기 상태
+  ...initialState,
 
   // 설정 액션
   setSearchQuery: (query) => set({ searchQuery: query }),
@@ -53,7 +62,7 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
   // 데이터 관련 액션
   searchPosts: async () => {
     const { searchQuery } = get()
-    set({ isLoading: true })
+    set({ isLoading: true, isSearchExecuted: true }) // 검색 실행 상태 설정
 
     try {
       if (!searchQuery.trim()) {
@@ -67,7 +76,7 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
       }
     } catch (error) {
       console.error("게시물 검색 오류:", error)
-      set({ filteredPosts: [] }) // 오류 시 빈 배열 설정
+      set({ filteredPosts: [] })
     } finally {
       set({ isLoading: false })
     }
@@ -78,7 +87,7 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
   },
 
   fetchPostsByTag: async (tag) => {
-    set({ isLoading: true })
+    set({ isLoading: true, isSearchExecuted: false }) // 태그 필터링시 검색 상태 리셋
 
     try {
       const result = await postApi.fetchPostsByTag(tag)
@@ -86,7 +95,7 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
       set({ filteredPosts: posts })
     } catch (error) {
       console.error("태그별 게시물 가져오기 오류:", error)
-      set({ filteredPosts: [] }) // 오류 시 빈 배열 설정
+      set({ filteredPosts: [] })
     } finally {
       set({ isLoading: false })
     }
@@ -102,7 +111,7 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
     const sorted = [...filteredPosts].sort((a, b) => {
       let comparison = 0
 
-      // 정렬 기준에 따른 비
+      // 정렬 기준에 따른 비교
       if (sortBy === "id") {
         comparison = a.id - b.id
       } else if (sortBy === "title") {
@@ -140,5 +149,8 @@ export const usePostFilterStore = create<PostFilterState>((set, get) => ({
     // URL 히스토리 업데이트
     const newUrl = `${window.location.pathname}?${params.toString()}`
     window.history.pushState({ path: newUrl }, "", newUrl)
-  }
+  },
+
+  // 스토어 초기화 함수 추가
+  resetStore: () => set(initialState)
 }))

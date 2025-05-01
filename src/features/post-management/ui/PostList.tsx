@@ -21,6 +21,7 @@ export const PostList = ({ tags = [], posts, onDeletePost }: PostListProps) => {
     sortOrder,
     filteredPosts,
     isLoading,
+    isSearchExecuted,
 
     // 액션
     setSearchQuery,
@@ -62,12 +63,12 @@ export const PostList = ({ tags = [], posts, onDeletePost }: PostListProps) => {
       loadInitialData()
     }
   }, [])
-  const displayPosts =
-    searchQuery.trim() !== ""
-      ? filteredPosts // 검색어가 있으면 filteredPosts 사용
-      : posts && posts.length > 0
-        ? posts
-        : filteredPosts
+
+  const displayPosts = isSearchExecuted
+    ? filteredPosts //
+    : posts && posts.length > 0
+      ? posts
+      : filteredPosts
   return (
     <>
       {/* 필터링 컴포넌트 */}
